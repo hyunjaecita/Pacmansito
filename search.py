@@ -28,12 +28,16 @@ class SearchProblem:
 
     You do not need to change anything in this class, ever.
     """
+    def __init__(self,start,goal,barrier):
+        self.start = start
+        self.goal = goal
+        self.barrier = barrier
 
     def getStartState(self):
         """
         Returns the start state for the search problem.
         """
-        util.raiseNotDefined()
+        return self.start
 
     def isGoalState(self, state):
         """
@@ -41,7 +45,9 @@ class SearchProblem:
 
         Returns True if and only if the state is a valid goal state.
         """
-        util.raiseNotDefined()
+        if (state == self.goal):
+            return True
+        return False
 
     def getSuccessors(self, state):
         """
@@ -52,7 +58,20 @@ class SearchProblem:
         state, 'action' is the action required to get there, and 'stepCost' is
         the incremental cost of expanding to that successor.
         """
-        util.raiseNotDefined()
+        x,y = state
+        successors = []
+        actions = {
+            "North": (x,y+1),
+            "South": (x,y-1),
+            "East": (x+1,y),
+            "West": (x-1,y),
+            "Stop": (state)
+        }
+
+        for action, position in actions.items():
+            if position not in self.barrier:
+                successors.append((position, action, 1))
+        return successors
 
     def getCostOfActions(self, actions):
         """
@@ -61,9 +80,19 @@ class SearchProblem:
         This method returns the total cost of a particular sequence of actions.
         The sequence must be composed of legal moves.
         """
-        util.raiseNotDefined()
+        if actions is None:
+          return float('inf')  # Invalid actions = Infinite cost
 
+        # Define action costs (customizable for different environments)
+        action_costs = {"North": 1, "South": 1, "East": 2, "West": 2}
 
+        cost = 0
+        for action in actions:
+            if action not in action_costs:
+                return float('inf')  # Illegal move detected!
+            cost += action_costs[action]  # Use predefined cost
+
+        return cost
 
 
 def tinyMazeSearch(problem: SearchProblem) -> List[Directions]:
@@ -71,6 +100,7 @@ def tinyMazeSearch(problem: SearchProblem) -> List[Directions]:
     Returns a sequence of moves that solves tinyMaze.  For any other maze, the
     sequence of moves will be incorrect, so only use this for tinyMaze.
     """
+    #si da fallo es aki lol
     s = Directions.SOUTH
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
@@ -124,13 +154,29 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
 
 def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    #REVISAR JRJRJRJRJRJEJEJEJJEJEJ
+    from util import Queue
+    queue = Queue()
+    start_state = problem.getStartState()
+    queue.push((start_state, []))
+    visited = set()
+
+    while not queue.isEmpty():
+        state, path = queue.pop()
+
+        if problem.isGoalState(state):
+            return path
+
+        if state not in visited:
+            visited.add(state)
+            for successor, action, _ in problem.getSuccessors(state):
+                queue.push((successor, path + [action]))
+
+    return []
 
 def uniformCostSearch(problem: SearchProblem) -> List[Directions]:
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
 
 def nullHeuristic(state, problem=None) -> float:
     """
