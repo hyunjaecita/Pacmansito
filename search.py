@@ -205,13 +205,36 @@ def exploration(problem):
     return exploration_path  # Return a full exploration path
 
 
+def contar_celdas(problem: SearchProblem):
+    """
+    Cuenta todas las celdas accesibles del mapa (sin paredes).
+    """
+    from util import Queue
+
+    queue = Queue()
+    start_state = problem.getStartState()
+    queue.push(start_state)
+
+    explored = set()  # Conjunto para almacenar las celdas visitadas
+
+    while not queue.isEmpty():
+        state = queue.pop()
+
+        if state not in explored:
+            explored.add(state)  # Marcamos la celda como visitada
+
+            # Agregamos todos los sucesores (sin importar si la meta ha sido encontrada)
+            for successor, action, step_cost in problem.getSuccessors(state):
+                queue.push(successor)
+
+    print("Número total de celdas accesibles en el mapa:", len(explored))
+    return len(explored)
 
 
 #Actividad 1:
 
 def exploracion(problem: SearchProblem):
     from util import Queue
-
     queue = Queue()
     start_state = problem.getStartState()
     queue.push((start_state, [], 0))  # Estado, lista de acciones, costo acumulado
@@ -222,6 +245,11 @@ def exploracion(problem: SearchProblem):
         state, actions, cost = queue.pop()
 
         if problem.isGoalState(state):
+            print("Esta es la solucion: ", actions)
+            print("Coste acumulado: ", cost)
+            print("Cantidad de pasos realizados: ", len(actions))
+            print("Numero de celdas unicas visitadas: ", len(explored))
+            print("Ratio de repeticion: ", (len(actions)/len(explored)))
             return actions
 
         if state not in explored:
@@ -236,26 +264,27 @@ def exploracion(problem: SearchProblem):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
     from util import Queue, PriorityQueue
-    fringe = PriorityQueue()  # Fringe to manage which states to expand
-    fringe.push(problem.getStartState(), 0)
-    currState = fringe.pop()
+
+    queue = PriorityQueue()  # Fringe to manage which states to expand
+    queue.push(problem.getStartState(), 0)
+    current_state = queue.pop()
     visited = []  # List to check whether state has already been visited
-    tempPath = []  # Temp variable to get intermediate paths
+    temp_path = []  # Temp variable to get intermediate paths
     path = []  # List to store final sequence of directions
-    pathToCurrent = PriorityQueue()  # Queue to store direction to children (currState and pathToCurrent go hand in hand)
-    while not problem.isGoalState(currState):
-        if currState not in visited:
-            visited.append(currState)
-            successors = problem.getSuccessors(currState)
+    pathToCurrent = PriorityQueue()  # Queue to store direction to children (current_state and pathToCurrent go hand in hand)
+
+    while not problem.isGoalState(current_state):
+        if current_state not in visited:
+            visited.append(current_state)
+            successors = problem.getSuccessors(current_state)
             for child, direction, cost in successors:
-                tempPath = path + [direction]
-                costToGo = problem.getCostOfActions(tempPath) + heuristic(child, problem)
+                temp_path = path + [direction]
+                cost = problem.getCostOfActions(temp_path) + heuristic(child, problem)
                 if child not in visited:
-                    fringe.push(child, costToGo)
-                    pathToCurrent.push(tempPath, costToGo)
-        currState = fringe.pop()
+                    queue.push(child, cost)
+                    pathToCurrent.push(temp_path, cost)
+        current_state = queue.pop()
         path = pathToCurrent.pop()
     return path
 
