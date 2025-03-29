@@ -105,51 +105,6 @@ def tinyMazeSearch(problem: SearchProblem) -> List[Directions]:
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
-def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
-    """
-    Search the deepest nodes in the search tree first.
-
-    Your search algorithm needs to return a list of actions that reaches the
-    goal. Make sure to implement a graph search algorithm.
-
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
-
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    """
-    from util import Stack
-    
-    # Initialize a stack for DFS
-    stack = Stack()
-
-    # Push the starting state with an empty path and a cost of 0
-    start_state = problem.getStartState()
-    stack.push((start_state, [], 0))
-
-    # Maintain a set to track visited nodes
-    visited = set()
-
-    while not stack.isEmpty():
-        # Pop the top state from the stack
-        state, path, cost = stack.pop()
-
-        # If the state is the goal, return the path
-        if problem.isGoalState(state):
-            return path
-
-        # If the state has not been visited, process it
-        if state not in visited:
-            visited.add(state)
-
-            # Get successors and push them onto the stack
-            for successor, action, step_cost in problem.getSuccessors(state):
-                if successor not in visited:
-                    new_path = path + [action]
-                    stack.push((successor, new_path, cost + step_cost))
-
-    return []  # Return empty list if no solution is found
 
 def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
     """Search the shallowest nodes in the search tree first."""
@@ -204,86 +159,54 @@ def exploration(problem):
 
     return exploration_path  # Return a full exploration path
 
-
-def contar_celdas(problem: SearchProblem):
-    """
-    Cuenta todas las celdas accesibles del mapa (sin paredes).
-    """
-    from util import Queue
-
-    queue = Queue()
+#Actividad 3: Agente de busqueda en profundidad (DFS)
+def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
+    from util import Stack
+    # Inicializamos la pila con el estado inicial
     start_state = problem.getStartState()
-    queue.push(start_state)
+    stack = Stack()
+    stack.push((start_state, [], 0))
 
-    explored = set()  # Conjunto para almacenar las celdas visitadas
+    visited = set() # Conjunto para registrar las celdas visitados
 
-    while not queue.isEmpty():
-        state = queue.pop()
-
-        if state not in explored:
-            explored.add(state)  # Marcamos la celda como visitada
-
-            # Agregamos todos los sucesores (sin importar si la meta ha sido encontrada)
-            for successor, action, step_cost in problem.getSuccessors(state):
-                queue.push(successor)
-
-    print("Número total de celdas accesibles en el mapa:", len(explored))
-    return len(explored)
-
-
-#Actividad 1:
-
-def exploracion(problem: SearchProblem):
-    from util import Queue
-    queue = Queue()
-    start_state = problem.getStartState()
-    queue.push((start_state, [], 0))  # Estado, lista de acciones, costo acumulado
-
-    explored = set()
-
-    while not queue.isEmpty():
-        state, actions, cost = queue.pop()
-
+    while not stack.isEmpty():
+        state, path, cost = stack.pop()
+        # Si encontramos la meta, devolvemos el camino tomado para llegar
         if problem.isGoalState(state):
-            print("Esta es la solucion: ", actions)
-            print("Coste acumulado: ", cost)
-            print("Cantidad de pasos realizados: ", len(actions))
-            print("Numero de celdas unicas visitadas: ", len(explored))
-            print("Ratio de repeticion: ", (len(actions)/len(explored)))
-            return actions
-
-        if state not in explored:
-            explored.add(state)
-
+            return path
+        if state not in visited:
+            visited.add(state)
+            # Expandimos los sucesores
             for successor, action, step_cost in problem.getSuccessors(state):
-                new_cost = cost + step_cost
-                new_actions = actions + [action]
-                queue.push((successor, new_actions, new_cost))
-
+                if successor not in visited:
+                    new_path = path + [action]  # Construimos el nuevo camino
+                    stack.push((successor, new_path, cost + step_cost))
     return []
 
+#Actividad 4: Agente de busqueda con la estrategia A* (BAE)
 def aStarSearch(problem, heuristic=nullHeuristic):
-    """Search the node that has the lowest combined cost and heuristic first."""
     from util import Queue, PriorityQueue
 
-    queue = PriorityQueue()  # Fringe to manage which states to expand
-    queue.push(problem.getStartState(), 0)
+    queue = PriorityQueue()
+    queue.push(problem.getStartState(), 0)  # Insertamos el estado inicial con prioridad 0
     current_state = queue.pop()
-    visited = []  # List to check whether state has already been visited
-    temp_path = []  # Temp variable to get intermediate paths
-    path = []  # List to store final sequence of directions
-    pathToCurrent = PriorityQueue()  # Queue to store direction to children (current_state and pathToCurrent go hand in hand)
+    visited = []
+    temp_path = []  # Lista temporal para construir caminos
+    path = []  # Lista que almacenará el camino final óptimo
+    pathToCurrent = PriorityQueue()  # Cola de prioridad para rastrear los caminos hasta los estados
 
     while not problem.isGoalState(current_state):
         if current_state not in visited:
             visited.append(current_state)
+            # Obtenemos los sucesores del estado actual
             successors = problem.getSuccessors(current_state)
             for child, direction, cost in successors:
-                temp_path = path + [direction]
-                cost = problem.getCostOfActions(temp_path) + heuristic(child, problem)
+                temp_path = path + [direction] # Construimos el camino hasta el hijo
+                cost = problem.getCostOfActions(temp_path) + heuristic(child, problem) # Calculamos el costo total: costo del camino + heurística
                 if child not in visited:
                     queue.push(child, cost)
                     pathToCurrent.push(temp_path, cost)
+        # Extraemos el siguiente estado con menor costo de la cola de prioridad
         current_state = queue.pop()
         path = pathToCurrent.pop()
     return path
