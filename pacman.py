@@ -210,7 +210,7 @@ class GameState:
         return self.data._lose
 
     def isWin( self ):
-        return self.data._win
+        return False;
 
     #############################################
     #             Helper methods:               #

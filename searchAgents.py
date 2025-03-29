@@ -555,6 +555,65 @@ def mazeDistance(point1: Tuple[int, int], point2: Tuple[int, int], gameState: pa
     prob = PositionSearchProblem(gameState, start=point1, goal=point2, warn=False, visualize=False)
     return len(search.bfs(prob))
 
-def agente_explorador(SearchAgent):
+from game import Agent
+from game import Directions
+import random
+
+from game import Agent
+from game import Directions
+
+
+class AgenteExplorador(Agent):
+    """
+    Un agente que explora todo el laberinto moviéndose en un patrón en espiral.
+    """
+
     def __init__(self):
-        super().__init__(self)
+        """
+        Inicializa el agente con una lista de acciones predefinidas que forman un patrón en espiral.
+        """
+        self.direcciones = [Directions.NORTH,Directions.WEST,Directions.EAST,Directions.SOUTH]
+        self.visitados = set()
+        self.pasos = 0
+        self.total_casillas = 0  # Inicializamos el total de casillas transitables
+
+    def countFreeSpaces(self, state):
+        """ Cuenta las casillas en el laberinto. """
+        walls = state.getWalls()  # Obtiene el grid de paredes
+        width, height = walls.width, walls.height
+        free_spaces = 0
+
+        for x in range(width):
+            for y in range(height):
+                if not walls[x][y]:  # Si no es un muro, es transitable
+                    free_spaces += 1
+
+        return free_spaces
+
+    def registerInitialState(self, state):
+        """ Se ejecuta una vez al inicio del juego para contar casillas. """
+        self.total_casillas = self.countFreeSpaces(state)
+        print("Total de casillas transitables en el laberinto:", self.total_casillas)
+
+    def getAction(self, state):
+        """
+        Devuelve la siguiente acción en el patrón de exploración si es legal.
+        Si la acción no es legal, se intenta la siguiente acción en la lista.
+        """
+        if len(self.visitados) >= self.total_casillas:
+            print("¡Todas las casillas han sido visitadas! Pac-Man se detiene.")
+            print("Casillas exploradas: ", len(self.visitados))
+            print("Total de pasos: ",self.pasos)
+            print("Ratio de repeticon: ", self.pasos/len(self.visitados))
+
+            return exit(0)
+
+        accion = random.choice(self.direcciones)
+        # Comprobar si el movimiento es legal
+        if accion in state.getLegalPacmanActions():
+            if state.getPacmanPosition() not in self.visitados:
+                self.visitados.add(state.getPacmanPosition())
+            self.pasos += 1
+            return accion
+        else:
+            return Directions.STOP
