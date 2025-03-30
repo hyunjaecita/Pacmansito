@@ -590,7 +590,7 @@ class AgenteExplorador(Agent):
         #Devuelve la siguiente acción en el patrón de exploración si es legal.
         #Si la acción no es legal, se intenta la siguiente acción en la lista.
 
-        if len(self.visitados) >= self.total_casillas:
+        if len(self.visitados) >= self.total_casillas or self.pasos==30000:
             print("¡Todas las casillas han sido visitadas! Pac-Man se detiene.")
             print("Casillas exploradas: ", len(self.visitados))
             print("Total de pasos: ",self.pasos)
