@@ -159,6 +159,11 @@ def exploration(problem):
 
     return exploration_path  # Return a full exploration path
 
+
+
+
+
+
 #Actividad 3: Agente de busqueda en profundidad (DFS)
 def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
     from util import Stack
@@ -182,6 +187,10 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
                     new_path = path + [action]  # Construimos el nuevo camino
                     stack.push((successor, new_path, cost + step_cost))
     return []
+
+
+
+
 
 #Actividad 4: Agente de busqueda con la estrategia A* (BAE)
 def aStarSearch(problem, heuristic=nullHeuristic):
@@ -210,6 +219,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         current_state = queue.pop()
         path = pathToCurrent.pop()
     return path
+
+
 
 # Abbreviations
 bfs = breadthFirstSearch

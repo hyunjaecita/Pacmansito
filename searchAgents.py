@@ -38,6 +38,7 @@ from typing import List, Tuple, Any
 from game import Directions
 from game import Agent
 from game import Actions
+from search import SearchProblem,  depthFirstSearch
 import util
 import time
 import search
@@ -555,52 +556,57 @@ def mazeDistance(point1: Tuple[int, int], point2: Tuple[int, int], gameState: pa
     prob = PositionSearchProblem(gameState, start=point1, goal=point2, warn=False, visualize=False)
     return len(search.bfs(prob))
 
+
+
+
 from game import Agent
 from game import Directions
 import random
 
-#Actividad 1: Agente que  explora todo el laberinto moviéndose en un patrón aleatorio.
+# Actividad 1: Agente que  explora el laberinto completo moviendose en un patron aleatorio
+
 class AgenteExplorador(Agent):
 
     def __init__(self):
-        #Inicializa el agente con una lista de acciones predefinidas
-        self.direcciones = [Directions.NORTH,Directions.WEST,Directions.EAST,Directions.SOUTH]
-        self.visitados = set()
-        self.pasos = 0
-        self.total_casillas = 0
+        # Inicializa el agente con una lista de acciones predefinidas
+        self.direcciones = [Directions.NORTH, Directions.WEST, Directions.EAST, Directions.SOUTH]
+        self.visitados = set() #Conjunto para almacenar las casillas visitadas
+        self.pasos = 0 # Contador de pasos realizados
+        self.meta = (0,0) # Posición de la meta
 
-    def cuentaCasillas(self, state):
-        #Cuenta las casillas en el laberinto para finalizar la exploracion en una condicion
-        casillas = 0
+    def encuentraMeta(self, state):
+        #Busca la posición de la meta dentro del laberinto.
+        meta = 0
         paredes = state.getWalls()
         anchura, altura = paredes.width, paredes.height
 
+        # Recorremos todas las posiciones del laberinto
         for x in range(anchura):
             for y in range(altura):
-                if not paredes[x][y]:  # Si no es una pared pacman puede pasar
-                    casillas += 1
-        return casillas
+                if state.getFood()[x][y]:  # Si esta el pellet en esta casilla se considera como la meta
+                    meta = (x, y)
+                    return meta
 
     def registerInitialState(self, state):
-        #Se ejecuta una vez al inicio del juego para contar casillas.
-        self.total_casillas = self.cuentaCasillas(state)
-        print("Total de casillas transitables en el laberinto:", self.total_casillas)
+        # Se ejecuta una vez al inicio del juego para encontrar la meta.
+        self.meta = self.encuentraMeta(state)
+        print("La meta se encuentra en la posicion:", self.meta)
 
     def getAction(self, state):
-        #Devuelve la siguiente acción en el patrón de exploración si es legal.
-        #Si la acción no es legal, se intenta la siguiente acción en la lista.
+        # Devuelve la siguiente acción en el patrón de exploración si es legal.
+        # Si la acción no es legal, se intenta la siguiente acción en la lista.
 
-        if len(self.visitados) >= self.total_casillas or self.pasos==30000:
-            print("¡Todas las casillas han sido visitadas! Pac-Man se detiene.")
-            print("Casillas exploradas: ", len(self.visitados))
-            print("Total de pasos: ",self.pasos)
-            print("Ratio de repeticon: ", self.pasos/len(self.visitados))
-            return exit(0)
+        accion = random.choice(self.direcciones)# Seleccionamos una dirección aleatoria
 
-        accion = random.choice(self.direcciones)
         # Comprobar si el movimiento es legal
         if accion in state.getLegalPacmanActions():
-            if state.getPacmanPosition() not in self.visitados:
+            if state.getPacmanPosition() not in self.visitados: # Si la casilla actual no ha sido visitada, la añadimos a visitados
+                estado_futuro = state.generateSuccessor(0, accion) # Generamos el estado futuro
+                # Si la nueva posición es la meta, imprimimos estadísticas de exploración
+                if estado_futuro.getPacmanPosition() == self.meta:
+                    print("Casillas exploradas: ", len(self.visitados))
+                    print("Total de pasos: ", self.pasos)
+                    print("Ratio de repeticon: ", self.pasos / len(self.visitados))
                 self.visitados.add(state.getPacmanPosition())
             self.pasos += 1
             return accion
