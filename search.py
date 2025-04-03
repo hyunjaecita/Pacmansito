@@ -178,6 +178,9 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
         state, path, cost = stack.pop()
         # Si encontramos la meta, devolvemos el camino tomado para llegar
         if problem.isGoalState(state):
+            print("Casillas exploradas:", len(visited))
+            print("Total de pasos:", len(path))
+            print("Ratio de repetición:", len(path) / len(visited))
             return path
         if state not in visited:
             visited.add(state)
@@ -218,6 +221,9 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         # Extraemos el siguiente estado con menor costo de la cola de prioridad
         current_state = queue.pop()
         path = pathToCurrent.pop()
+    print("Casillas exploradas:", len(visited))
+    print("Total de pasos:", len(path))
+    print("Ratio de repetición:", len(path) / len(visited))
     return path
 
 
