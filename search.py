@@ -170,7 +170,7 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
     # Inicializamos la pila con el estado inicial
     start_state = problem.getStartState()
     stack = Stack()
-    stack.push((start_state, [], 0))
+    stack.push((start_state, [], 0)#)
 
     visited = set() # Conjunto para registrar las celdas visitados
 
