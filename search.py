@@ -168,21 +168,21 @@ def exploration(problem):
 def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
     from util import Stack
 
-    # Obtenemos el estado inicial del problema
+    #Obtenemos el estado inicial del problema
     start_state = problem.getStartState()
 
- # Inicializamos la pila con una tupla que contiene:
- #  - El estado inicial
- #  - Una lista vacía para almacenar el camino recorrido
- #  - Un costo acumulado
+     #Inicializamos la pila con una tupla que contiene:
+     #- El estado inicial
+     #- Una lista vacía para almacenar el camino recorrido
+     #- Un costo acumulado
     stack = Stack()
     stack.push((start_state, [], 0))
 
-    visited = set() # Conjunto para registrar las celdas visitados
+    visited = set() #Conjunto para registrar las celdas visitados
 
     while stack.isEmpty()==False:
         state, path, cost = stack.pop()
-        # Si encontramos la meta, devolvemos el camino tomado para llegar
+        #Si encontramos la meta, devolvemos el camino tomado para llegar
         if problem.isGoalState(state):
             print("Casillas exploradas:", len(visited))
             print("Total de pasos:", len(path))
@@ -190,7 +190,7 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
             return path
         if state not in visited:
             visited.add(state) #si el estado no ha sido visitado lo marcamos como visitado
-            # Expandimos los sucesores del estado actual
+            #Expandimos los sucesores del estado actual
             for successor, action, step_cost in problem.getSuccessors(state):
                 if successor not in visited:
                     new_path = path + [action]  # Si el sucesor no ha sido visitado construimos un nuevo camino
@@ -209,29 +209,29 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     queue.push(problem.getStartState(), 0)  # Insertamos el estado inicial con prioridad 0
     current_state = queue.pop()
 
-    visited = [] # Lista para registrar los nodos visitados
-    temp_path = []  # Lista temporal para construir caminos
-    path = []  # Lista que almacenará el camino final óptimo
-    pathToCurrent = PriorityQueue()  # Cola de prioridad para rastrear los caminos hasta los estados
+    visited = [] #Lista para registrar los nodos visitados
+    temp_path = []  #Lista temporal para construir caminos
+    path = []  #Lista que almacenará el camino final óptimo
+    pathToCurrent = PriorityQueue()  #Cola de prioridad para rastrear los caminos hasta los estados
 
     while problem.isGoalState(current_state)==False:
         if current_state not in visited:
-            visited.append(current_state) # Si el nodo no ha sido visitado se marca como visitado
-            # Obtenemos los sucesores del estado actual
+            visited.append(current_state) #Si el nodo no ha sido visitado se marca como visitado
+            #Obtenemos los sucesores del estado actual
             successors = problem.getSuccessors(current_state)
             for child, direction, cost in successors:
-                temp_path = path + [direction] # Construimos el camino hasta el hijo
+                temp_path = path + [direction] #Construimos el camino hasta el hijo
                 cost = problem.getCostOfActions(temp_path) + heuristic(child, problem) # Calculamos el costo total: costo del camino + heurística
                 if child not in visited:
-                    queue.push(child, cost) # Si el hijo no ha sido visitado lo agregamos a la cola de prioridad
-                    pathToCurrent.push(temp_path, cost) # Y guardamos el camino con su costo
-        # Extraemos el siguiente estado con menor costo de la cola de prioridad
+                    queue.push(child, cost) #Si el hijo no ha sido visitado lo agregamos a la cola de prioridad
+                    pathToCurrent.push(temp_path, cost) #Y guardamos el camino con su costo
+        #Extraemos el siguiente estado con menor costo de la cola de prioridad
         current_state = queue.pop()
-        path = pathToCurrent.pop() # Extraemos el camino que corresponde al estado actual
+        path = pathToCurrent.pop() #Extraemos el camino que corresponde al estado actual
     print("Casillas exploradas:", len(visited))
     print("Total de pasos:", len(path))
     print("Ratio de repetición:", len(path) / len(visited))
-    return path # Devolvemos el camino óptimo encontrado
+    return path #Devolvemos el camino óptimo encontrado
 
 
 
