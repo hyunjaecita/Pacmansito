@@ -264,9 +264,7 @@ class MiAgente_DFS(SearchAgent):
         self.searchFunction = search.depthFirstSearch
         self.searchType = lambda state: PositionSearchProblem(state)
         
-        
-        
-        
+
         
 
 def manhattanHeuristic(position, problem, info={}):
